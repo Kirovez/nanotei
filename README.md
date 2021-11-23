@@ -159,7 +159,7 @@ python3 ../nanotei.py ./sorted_SRR14765194_vs_TAIR10.bam ./SRR14765194_1.fastq G
   
   **pvalue** - the probability that this insertion is real based on the number of reads supporting TEI and the genome coverage distribution (so 1 is absolutely OK and 0 - is bad TEI).
   
-  **isTEIregioIsOK** - it is always TRUE because nanotei is filtered out all the regions with too high coverage based on expectation from genome coverage distribution
+  **isTEIregioIsOK** - it is FALSE if the number of reads in the region flanking TEI is too high based on expectation from genome coverage distribution
   
   **TE_reads** - it shows the number of mapped sequences of clipped parts and insertion parts of the reads overlaped with TEs from bed file.
   
