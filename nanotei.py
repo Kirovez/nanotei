@@ -191,7 +191,7 @@ def getBedFromClippedBam(bamfile_clips):
 def getFinalTable(inter_in, GenCov, overlap_with_origTE=0.5, min_read_support = 2, minpvalue = 0.05, filter_by_pvalue = True):
     # select the best overlapping
     inter_in = pd.read_csv(inter_in, sep="\t", header=None)
-    inter = inter_in.loc[(inter_in[2] - inter_in[1]) * overlap_with_origTE > inter_in[8]]  # .groupby([7]).greater()
+    inter = inter_in.loc[(inter_in[2] - inter_in[1]) * overlap_with_origTE < inter_in[8]]  # .groupby([7]).greater()
 
     # add tei coord column and read id
     inter[['TEIcoord', 'read']] = inter[7].str.split('#', 1, expand=True)
@@ -255,8 +255,6 @@ def getFinalTable(inter_in, GenCov, overlap_with_origTE=0.5, min_read_support = 
 
 def getbed(df):
     tmpbed = df['TEIcoord'].str.split(r':', 1, expand=True)
-    # bed = tmpbed["start"].str.split('..', 1, expand=True)
-    # tmpbed[['chr', 'start']] = tmpbed[1].str.split(':', 1, expand=True)
     tmpbed[['start', 'end']] = tmpbed[1].str.split('\..', 1, expand=True)
     tmpbed['TEIcoord'] = df['TEIcoord']
 
@@ -265,7 +263,7 @@ def getbed(df):
 def run_nanotei(bam_file, fastq, genome_fasta, outfolder, bed_TE, outtab, mapping_quality=40, min_len_clipped=1000,
                  min_distance=20, minimap2_path = 'minimap2',
          samtools_path = "samtools", bedtools = 'bedtools', overlap_with_origTE = 0.5, minpvalue = 0.05,
-                filter_by_pvalue = True, write_bed = False):
+                filter_by_pvalue = True, write_bed = False, min_read_support = 2):
     outFolder = outfolder
     if outFolder[-1] != '/':
         outFolder += "/"
@@ -293,8 +291,8 @@ def run_nanotei(bam_file, fastq, genome_fasta, outfolder, bed_TE, outtab, mappin
     print("7. Parsing the table and filtering TEIs by number of supported reads and read coverage in the TEI region")
     ## estimate coverage of the genome by bam file
     GenCov = CovEstimation(bam_file, sample_per_chr=20)
-    final_tab = getFinalTable(inter_file, GenCov, overlap_with_origTE=overlap_with_origTE, minpvalue=minpvalue, filter_by_pvalue = filter_by_pvalue)
-    print('Number of TEs selected', len(final_tab))
+    final_tab = getFinalTable(inter_file, GenCov, overlap_with_origTE=overlap_with_origTE, minpvalue=minpvalue, filter_by_pvalue = filter_by_pvalue, min_read_support = min_read_support)
+    print('Number of TEIs selected', len(final_tab))
     final_tab.to_csv(outtab, sep='\t', index=False)
 
     if write_bed:
@@ -321,7 +319,9 @@ if __name__ == "__main__":
     parser.add_argument('-ovt', '--overlap_with_origTE', help='minimum portion of origin TE overlapped with clipped repa alignemnt', default=0.5,  type = float)
     parser.add_argument('-mpv', '--minpvalue', help='minimum pvalue to filter (it is used with --fpv)', default=0.05, type = float)
     parser.add_argument('--fpv', help='filter by pvalue', action='store_true')
+    parser.add_argument('-mrs', '--min_read_support', help='minimum read support for filtering', default=2, type = int)
     parser.add_argument('--bed', help='filter by pvalue', action='store_true')
+
 
 
     args = parser.parse_args()
@@ -330,4 +330,5 @@ if __name__ == "__main__":
     run_nanotei(args.bam_file, args.fastq, args.genome_fasta, args.outfolder, args.bed_TE, args.outtab, mapping_quality=args.map_q,
                 min_len_clipped=args.min_len_clipped,
                 min_distance= args.min_merge_distance, minimap2_path = args.minimap2_path,
-         samtools_path = args.samtools_path,  bedtools = args.bedtools, minpvalue = args.minpvalue, filter_by_pvalue = args.fpv, write_bed = False)
+         samtools_path = args.samtools_path,  bedtools = args.bedtools, minpvalue = args.minpvalue, min_read_support = args.min_read_support,
+                filter_by_pvalue = args.fpv, write_bed = args.bed)

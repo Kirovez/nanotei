@@ -121,6 +121,20 @@ python3 nanotei.py sorted_mapped.bam ONT_reads.fastq  genome.fasta out_nanotei T
   **TE.start** - chromosome start of chosen TE
   
   **TE.end** - chromosome end of chosen TE
+
+## Example of running nanotei using Arabidopsis thaliana dataset
+### Download datasets
+```
+
+```
+
+#activate conda env
+source activate nanotei
+
+
+#run nanotei.py
+python3 nanotei.py sorted_mapped.bam ONT_reads.fastq  genome.fasta out_nanotei TEannotation.bed outfile.nanotei --fpv --bed --minpvalue 0.05
+
   
   ## nanotei citation
   
