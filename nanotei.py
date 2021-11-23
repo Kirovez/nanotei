@@ -153,7 +153,7 @@ def mapppingBamSort(reads, genome_fasta, mm2='minimap2', samtools_path="samtools
     if r'/' in bam_file:
         sort_bam_file = bam_file.rsplit(r'/', 1)[0] + r"/sorted_" + bam_file.rsplit(r'/', 1)[1]
     else:
-        sort_bam_file = r"/sorted_" + bam_file
+        sort_bam_file = r"./sorted_" + bam_file
 
     ##sam to bam
     samview = '{2} view -Sb {0} > {1}'.format(sam_file, bam_file, samtools_path)

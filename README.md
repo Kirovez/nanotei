@@ -90,9 +90,8 @@ Script to find regions of insertions using Nanopore reads
   **bed_TE** nanotei requires 4-column bed file without header: chromosome_id, start, end, TEid. 
   
   
-  ## example of the command
-### get copy of githup repository
-### change directory to test
+## Example of how to run nanotei
+### get copy of githup repository and change the directory to test
 ```
 git clone https://github.com/Kirovez/nanotei.git
 cd ./nanotei/test
