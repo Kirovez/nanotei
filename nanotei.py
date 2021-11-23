@@ -150,7 +150,10 @@ def mapppingBamSort(reads, genome_fasta, mm2='minimap2', samtools_path="samtools
     os.system('{3} -ax map-ont -t 150 {0} {1} > {2}.sam'.format(genome_fasta, reads, reads, mm2))
     sam_file = '{0}.sam'.format(reads)
     bam_file = sam_file.rsplit('.', 1)[0] + ".bam"
-    sort_bam_file = bam_file.rsplit(r'/', 1)[0] + r"/sorted_" + bam_file.rsplit(r'/', 1)[1]
+    if r'/' in bam_file:
+        sort_bam_file = bam_file.rsplit(r'/', 1)[0] + r"/sorted_" + bam_file.rsplit(r'/', 1)[1]
+    else:
+        sort_bam_file = r"/sorted_" + bam_file
 
     ##sam to bam
     samview = '{2} view -Sb {0} > {1}'.format(sam_file, bam_file, samtools_path)
