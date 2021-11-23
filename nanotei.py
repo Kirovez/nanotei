@@ -210,8 +210,8 @@ def getFinalTable(inter_in, GenCov, overlap_with_origTE=0.5, min_read_support = 
     ## evaluate the read coverage in TEI region
     well_supported_TEIs['isTEIregioIsOK'] = well_supported_TEIs['TEIcoord'].map(GenCov.isTEI_cov_OK)
 
-    well_supported_TEIs_filtered = well_supported_TEIs.loc[well_supported_TEIs.isTEIregioIsOK]
-    print("Filtered by TEI region coverage: ", len(well_supported_TEIs) - len(well_supported_TEIs_filtered))
+    well_supported_TEIs_filtered = well_supported_TEIs #
+    print("TEI with too high region coverage (not fit Poisson distribution): ", len(well_supported_TEIs) - len(well_supported_TEIs.loc[well_supported_TEIs.isTEIregioIsOK]))
 
     ## aggregate data by TEI coordintate and TE id
     oneTEI_manyTE = inter.groupby(['TEIcoord', 3]).agg({7: 'nunique'}).reset_index()
@@ -292,7 +292,7 @@ def run_nanotei(bam_file, fastq, genome_fasta, outfolder, bed_TE, outtab, mappin
     ## estimate coverage of the genome by bam file
     GenCov = CovEstimation(bam_file, sample_per_chr=20)
     final_tab = getFinalTable(inter_file, GenCov, overlap_with_origTE=overlap_with_origTE, minpvalue=minpvalue, filter_by_pvalue = filter_by_pvalue, min_read_support = min_read_support)
-    print('Number of TEIs selected', len(final_tab))
+    print('Total number of TEIs in the output table', len(final_tab))
     final_tab.to_csv(outtab, sep='\t', index=False)
 
     if write_bed:

@@ -74,8 +74,9 @@ Script to find regions of insertions using Nanopore reads
                         repa alignemnt
                         
   *-mpv* MINPVALUE, *--minpvalue* MINPVALUE
-                        minimum pvalue to filter (it is used with --fpv)
-  *--fpv*                 filter by pvalue
+                        minimum pvalue to filter (it is used with --fpv). 
+                        pvalue here reflects the probability that the TEI is OK (so usually it should be > 0.05) 
+  *--fpv*                 
   
   *-mrs* MIN_READ_SUPPORT, *--min_read_support* MIN_READ_SUPPORT
                         minimum read support for filtering
@@ -90,16 +91,65 @@ Script to find regions of insertions using Nanopore reads
   
   
   ## example of the command
+### get copy of githup repository
+### change directory to test
+```
+git clone https://github.com/Kirovez/nanotei.git
+cd ./nanotei/test
 
 ```
-#activate conda env
-source activate nanotei
+### 1. download TAIR10 genome from NCBI and move it to test directory (it must be current directory)
+TAIR10.1 repository: https://www.ncbi.nlm.nih.gov/assembly/GCF_000001735.4#/def_asm_Primary_Assembly
 
+unpack tar and unzip .gz in the folder. Then move GCF_000001735.4_TAIR10.1_genomic.fna file to test directory (current directory). Examples of the commands:
+    
+```
+tar -xvf genome_assemblies_genome_fasta.tar
 
-#run nanotei.py
-python3 nanotei.py sorted_mapped.bam ONT_reads.fastq  genome.fasta out_nanotei TEannotation.bed outfile.nanotei --fpv --bed --minpvalue 0.05
-  ```
-  
+gunzip ./ncbi-genomes-2021-11-23/GCF_000001735.4_TAIR10.1_genomic.fna.gz
+
+mv ./ncbi-genomes-2021-11-23/GCF_000001735.4_TAIR10.1_genomic.fna .
+
+```
+        
+### 2. download Nanopore reads of ddm1 plant
+
+```
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR147/094/SRR14765194/SRR14765194_1.fastq.gz 
+## gunzip
+gunzip SRR14765194_1.fastq.gz
+
+```
+### 3. TE annotation file that was build by Panda and Slotkin, 2020 must be already in the test directory. The chromosome ids were changed according to the NCBI chromosome ids. The file is available on GitHub:
+```
+wget https://raw.githubusercontent.com/Kirovez/nanotei/master/test/TE_31189_Slotkin_NCBI_id.bed
+```
+
+### 4. map the reads to the genome using minimap2, then convert sam file to bam, sort and index:
+#### mapping
+minimap2 -ax map-ont -t 100 GCF_000001735.4_TAIR10.1_genomic.fna SRR14765194_1.fastq > SRR14765194_vs_TAIR10.sam
+#### convert sam to bam
+
+```
+samtools view -Sb SRR14765194_vs_TAIR10.sam > SRR14765194_vs_TAIR10.bam 
+```
+
+#### sort bam file
+
+``` 
+samtools sort -o sorted_SRR14765194_vs_TAIR10.bam -@ 100 SRR14765194_vs_TAIR10.bam 
+```
+#### index
+```
+samtools index -@ 100 sorted_SRR14765194_vs_TAIR10.bam
+```
+### 5. run nanotei (please, use absolute path to input files or ./ before file name ). The resulted files will appear in the current directory (it will be changed in later versions).
+```
+python3 ../nanotei.py ./sorted_SRR14765194_vs_TAIR10.bam ./SRR14765194_1.fastq GCF_000001735.4_TAIR10.1_genomic.fna ./out_nanotei ./TE_31189_Slotkin_NCBI_id.bed SRR14765194.nanotei --fpv --bed --minpvalue 0.05 -ovt 0.3
+
+```
+
+#### an example ot output table and bed file can be found in out_example folder. Note: TEIs in output folder for ddm1 includes ddm1 specific TEIs and TEIs that resulted from assembly artefacts (~44 TEIs, see nanotei paper for details)  
   
   ## Output table
   The output nanotei table contains the following columns:
@@ -121,20 +171,6 @@ python3 nanotei.py sorted_mapped.bam ONT_reads.fastq  genome.fasta out_nanotei T
   **TE.start** - chromosome start of chosen TE
   
   **TE.end** - chromosome end of chosen TE
-
-## Example of running nanotei using Arabidopsis thaliana dataset
-### Download datasets
-```
-
-```
-
-#activate conda env
-source activate nanotei
-
-
-#run nanotei.py
-python3 nanotei.py sorted_mapped.bam ONT_reads.fastq  genome.fasta out_nanotei TEannotation.bed outfile.nanotei --fpv --bed --minpvalue 0.05
-
   
   ## nanotei citation
   

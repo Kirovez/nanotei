@@ -76,7 +76,7 @@ class CovEstimation:
             return False
 
         m = mean(sorted(cov))
-        if self.getPvalueGreater(round(m / 2)) > 0.05 and self.getPvalueSmaller(round(m / 2)) > 0.05:
+        if self.getPvalueGreater(round(m / 2)) > 0.05:
             return True
         else:
             print(f"Reads depth ({m}) in TEI {jbrpos} is outlier")
