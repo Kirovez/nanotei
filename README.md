@@ -76,7 +76,7 @@ Script to find regions of insertions using Nanopore reads
   *-mpv* MINPVALUE, *--minpvalue* MINPVALUE
                         minimum pvalue to filter (it is used with --fpv). 
                         pvalue here reflects the probability that the TEI is OK (so usually it should be > 0.05) 
-  *--fpv*                 
+  *--fpv*                 filter by pvalue. Note! If it is NOT set then TEIs with low (than expected by Poisson distribution) read number will be reported (including somatic TEIs). This option may significantly reduce calculation time.
   
   *-mrs* MIN_READ_SUPPORT, *--min_read_support* MIN_READ_SUPPORT
                         minimum read support for filtering
@@ -142,7 +142,7 @@ samtools sort -o sorted_SRR14765194_vs_TAIR10.bam -@ 100 SRR14765194_vs_TAIR10.b
 ```
 samtools index -@ 100 sorted_SRR14765194_vs_TAIR10.bam
 ```
-### 5. run nanotei (please, use absolute path to input files or ./ before file name ). The resulted files will appear in the current directory (it will be changed in later versions).
+### 5. run nanotei. The resulted files will appear in the current directory (it will be changed in later versions).
 ```
 python3 ../nanotei.py ./sorted_SRR14765194_vs_TAIR10.bam ./SRR14765194_1.fastq GCF_000001735.4_TAIR10.1_genomic.fna ./out_nanotei ./TE_31189_Slotkin_NCBI_id.bed SRR14765194.nanotei --fpv --bed --minpvalue 0.05 -ovt 0.3
 
