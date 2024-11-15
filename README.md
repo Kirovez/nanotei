@@ -173,5 +173,5 @@ python3 ../nanotei.py ./sorted_SRR14765194_vs_TAIR10.bam ./SRR14765194_1.fastq G
   
   ## nanotei citation
   
-  We are currently preparing the manuscript.
+If you use nanotei, please, cite our paper: https://doi.org/10.3390/plants10122681 
   
